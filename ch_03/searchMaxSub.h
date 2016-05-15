@@ -4,7 +4,8 @@
 using std::vector;
 
 //contains four methods to find maximum contiguous subsequence sum.
-class searchMaxSub {
+class searchMaxSub 
+{
 public:
     int findMaxSub1(vector<int> & arr) const;
     int findMaxSub2(vector<int> & arr) const;
