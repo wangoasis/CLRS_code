@@ -1,6 +1,13 @@
 /*
+    exercise 10.2-5
     Implement the dictionary operations INSERT, DELETE and 
     SEARCH using singly linked, circular lists. 
+
+    exercise 10.2-7
+    Give a O(n)-time nonrecursive procedure that reverses a 
+    singly linked list of n elements; The procedure should use
+    no more than constant storage beyond that needed for the 
+    list itself.
 */
 
 #include <iostream>
@@ -79,6 +86,21 @@ public:
         }
     }
 
+    void reverse()
+    {
+        Node* temp(null_node), *prev(null_node);
+        Node* node = head->next;
+        while (node != null_node)
+        {
+            temp = node->next;
+            node->next = prev;
+            prev = node;
+            node = temp;
+        }
+        node->next = prev;
+        head = node;
+    }
+
     void show()
     {
         Node* node = head->next;
@@ -102,5 +124,9 @@ int main()
     std::cout << dict.exists(11) << std::endl; 
     dict.del(5);
     std::cout << dict.exists(5) << std::endl; 
+    dict.show();
+    
+    // reverse the list
+    dict.reverse();
     dict.show();
 }

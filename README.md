@@ -8,4 +8,7 @@
 * Chapter 6: [Heapsort](https://github.com/wangoasis/CLRS_code/tree/master/ch_06)
 * Chapter 7: [Quicksort](https://github.com/wangoasis/CLRS_code/tree/master/ch_07)
 * Chapter 8: [Sorting in Linear Time](https://github.com/wangoasis/CLRS_code/tree/master/ch_08)
-* chapter 9: [Medians and Order Statistics](https://github.com/wangoasis/CLRS_code/tree/master/ch_09)
+* Chapter 9: [Medians and Order Statistics](https://github.com/wangoasis/CLRS_code/tree/master/ch_09)
+
+### Data Structures
+* Chapter 10: [Elementary Data Structures](https://github.com/wangoasis/CLRS_code/tree/master/ch_10)
