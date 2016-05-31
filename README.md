@@ -15,3 +15,4 @@
 * Chapter 11: [Hash Tables](https://github.com/wangoasis/CLRS_code/tree/master/ch_11)
 * Chapter 12: [Binary Search Trees](https://github.com/wangoasis/CLRS_code/tree/master/ch_12)
 * Chapter 13: [Red-Black Trees](https://github.com/wangoasis/CLRS_code/tree/master/ch_13)
+* Chapter 14: [Augmenting Data Structures](https://github.com/wangoasis/CLRS_code/tree/master/ch_14)
