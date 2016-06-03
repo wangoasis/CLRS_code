@@ -1,3 +1,4 @@
 *.out
 *.o
 to_be_modified/*
+*.pyc
