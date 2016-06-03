@@ -1,3 +1,6 @@
+# O(N^2)
+# exercise 15.4-5
+
 import quicksort
 import longest_commom_sub
 import random
