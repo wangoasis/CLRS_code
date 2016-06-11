@@ -19,3 +19,4 @@
 
 ### Advanced Design and Analysis Techniques
 * Chapter 15: [Dynamic Programming](https://github.com/wangoasis/CLRS_code/tree/master/ch_15)
+* Chapter 16: [Greedy Algorithms](https://github.com/wangoasis/CLRS_code/tree/master/ch_16)
