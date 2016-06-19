@@ -8,7 +8,20 @@ int main()
     {
         tree.insert(i);
     }
-    std::cout << tree.exists(5) << std::endl;
+    std::cout << "exists 95? " << tree.exists(95) << std::endl;
+//    std::cout << "print tree" << std::endl;
 //    tree.print_tree();
-    std::cout << tree.predecessor(90) << std::endl;
+    std::cout << "max: " << tree.find_max() << std::endl;
+    std::cout << "min: " << tree.find_min() << std::endl;
+
+    std::cout << "remove 33..." << std::endl;
+    tree.remove(33);
+
+//    std::cout << "print tree" << std::endl;
+//    tree.print_tree();
+
+    std::cout << "exists 33? " << tree.exists(33) << std::endl;
+    std::cout << "exists 34? " << tree.exists(34) << std::endl;
+    std::cout << "predecessor of 34: " << tree.predecessor(34) << std::endl;
 }
+

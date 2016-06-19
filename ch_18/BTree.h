@@ -27,8 +27,10 @@ private:
         { }
     };
     
-    Node* root;
+    Node* root; // root of B-tree
+
 public:
+
     BTree()
     {
         root = allocate_node();
@@ -75,7 +77,7 @@ public:
 
     void remove(const T & value)
     {
-
+        remove(root, value);
     }
 
     bool exists(const T & value) const
@@ -146,20 +148,26 @@ private:
 
     bool exists(const T & value, Node* node) const
     {
-        int i = 1;
-        while (i <= node->n && value > node->key_values[i])
-            i++;
-        if (i <= node->n && value == node->key_values[i])
-            return true; 
-        else if (node->is_leaf)
-            return false;
-        else
+        if (node != NULL)
         {
+            int i = 1;
+            while (i <= node->n && value > node->key_values[i])
+                i++;
+            if (i <= node->n && value == node->key_values[i])
+                // value is in node
+                return true; 
+            else if (node->is_leaf)
+                return false;
+            else
+            {
 #ifdef _DISK_MODE
-            disk_read(node->children[i]);
+                disk_read(node->children[i]);
 #endif
-            return exists(value, node->children[i]);
+                return exists(value, node->children[i]);
+            }
         }
+        else
+            return false;
     }
 
     void destroy(Node* node)
@@ -191,7 +199,8 @@ private:
         }
     }
 
-    // split the ith child of node
+    // split the ith child of node, the number of key_values of ith child
+    // is 2*t-1
     void split_child(Node* & x, int i)
     {
         Node* y = x->children[i];
@@ -227,6 +236,7 @@ private:
 #endif
     }
 
+    // insert a value to a nonfull node
     void insert_nonfull(Node* & x, const T & value)
     {
         if (x->is_leaf)
@@ -248,7 +258,7 @@ private:
             disk_write(x);
 #endif
         }
-        else
+        else // x is an internal node
         {
             int i = 1;
             while (i <= x->n && value > x->key_values[i])
@@ -353,6 +363,162 @@ private:
             return std::make_pair(nullptr, -1);
         else 
             return search(node->children[i], value);  
+    }
+
+    void remove(Node* & x, const T & value)
+    {
+        int i = 1;
+        while (i <= x->n && value > x->key_values[i])
+            i++;
+        if (i <= x->n && value == x->key_values[i]) // value is in node x
+        {
+            if (x->is_leaf) // x is a leaf node
+            {
+                for (int j = i + 1; j <= x->n; j++)
+                    x->key_values[j - 1] = x->key_values[j];
+                x->n--;
+                return;
+            }
+            else // x is a internal node
+            {
+                Node* prev_child = x->children[i];
+                Node* next_child = x->children[i + 1];
+
+                if (prev_child->n >= t)
+                {
+                    // get the predecessor of key_value: value
+                    T prev_key = pre_key_value(prev_child);
+                    remove(prev_child, prev_key);
+                    x->key_values[i] = prev_key;
+                    return;
+                }
+                else if(next_child->n >= t)
+                {
+                    // get the successor of key_value: value
+                    T next_key = suc_key_value(next_child);
+                    remove(next_child, next_key);
+                    x->key_values[i] = next_key;
+                    return;
+                }
+                else 
+                {
+                    merge_child(x, i);
+                    remove(prev_child, value);
+                }
+            }
+        }
+        else // value is not in node x
+        {
+            // value is in sub-tree of root x->children[i]
+            Node* root2 = x->children[i];
+            if (root2->n == t - 1)
+            {   
+                Node* root2_left = i > 1 ? x->children[i - 1] : nullptr;
+                Node* root2_right = i <= x->n ? x->children[i + 1] : nullptr;
+                if (root2_left && root2_left->n >= t)
+                {
+                    // move down x->key_values[i-1]
+                    for (int j = root2->n; j >= 1; j--)
+                        root2->key_values[j + 1] = root2->key_values[j];
+                    root2->key_values[1] = x->key_values[i - 1];
+
+                    // move children
+                    if (!root2->is_leaf)
+                    {   
+                        for (int j = root2->n + 1; j >= 1; j--)
+                            root2->children[j + 1] = root2->children[j];
+                        root2->children[1] = root2_left->children[root2_left->n + 1];
+                    }
+
+                    root2->n++;
+                    x->key_values[i - 1] = root2_left->key_values[root2_left->n];
+                    root2_left->n--;
+                }
+                else if (root2_right && root2_right->n >= t)
+                {
+                    // move down x->key_values[i]
+                    root2->key_values[root2->n + 1] = x->key_values[i];
+                    root2->n++;
+                    x->key_values[i] = root2_right->key_values[1];
+                    root2_right->n--;
+
+                    // move key_values
+                    for (int j = 1; j <= root2_right->n; j++)
+                        root2_right->key_values[j] = root2_right->key_values[j + 1];
+
+                    // move children
+                    if (!root2->is_leaf)
+                    {   
+                        root2->children[root2->n + 1] = root2_right->children[1];
+                        for (int j = 1; j <= root2_right->n + 1; j++)
+                            root2_right->children[j] = root2_right->children[j + 1];
+                    }
+                }
+                // root2_left and root2_right both have t-1 key_values
+                else if (root2_left)
+                {
+                    merge_child(x, i - 1);
+                    root2 = root2_left;
+                }
+                else if (root2_right)
+                    merge_child(x, i);
+            }
+            remove(root2, value);
+        }
+    }
+
+    // x->children[i] and x->children[i+1] both have t - 1 key-values
+    // this method merge this two children, and move x->key_values[i]
+    // to the merged children. Therefore, the merged chlldren has
+    // 2*t-1 key-values
+    void merge_child(Node* & x, int i)
+    {
+        Node* prev_child = x->children[i];
+        Node* next_child = x->children[i + 1];
+
+        prev_child->n = 2 * t - 1;
+        // move down x->key_values[i]
+        prev_child->key_values[t] = x->key_values[i];
+
+        // copy key_values
+        for (int j = t + 1; j <= 2 * t - 1; j++)
+            prev_child->key_values[j] = next_child->key_values[j - t];
+        // copy children
+        if (!prev_child->is_leaf)
+        {
+            for (int j = t + 1; j <= 2 * t; j++)
+                prev_child->children[j] = next_child->children[j - t];
+        }
+
+        // delete key_value and child in node x
+        for (int j = i + 1; j <= x->n; j++)
+        {
+            x->key_values[j - 1] = x->key_values[j];
+            x->children[j] = x->children[j + 1];
+        }
+        x->n--;
+
+        delete next_child;
+        if (x->n == 0)
+            delete x;
+    }
+
+    // Node x is the node before a key value
+    // this method finds the predecessor
+    T pre_key_value(Node* x)
+    {
+        while (!x->is_leaf)
+            x = x->children[x->n + 1];
+        return x->key_values[x->n];
+    }
+
+    // Node x is the node after a key value
+    // this method finds the successor
+    T suc_key_value(Node* x)
+    {
+        while (!x->is_leaf)
+            x = x->children[1];
+        return x->key_values[1];
     }
 };
 
