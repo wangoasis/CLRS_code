@@ -20,3 +20,7 @@
 ### Advanced Design and Analysis Techniques
 * Chapter 15: [Dynamic Programming](https://github.com/wangoasis/CLRS_code/tree/master/ch_15)
 * Chapter 16: [Greedy Algorithms](https://github.com/wangoasis/CLRS_code/tree/master/ch_16)
+
+### Advanced Data Structures
+* Chapter 18: [B-Trees](https://github.com/wangoasis/CLRS_code/tree/master/ch_18)
+* Chapter 19: [Binomial Heaps](https://github.com/wangoasis/CLRS_code/tree/master/ch_19)
