@@ -38,5 +38,8 @@ void init_graph()
 int main()
 {
     init_graph();
+    std::cout << "------BFS------" << std::endl;
     BFS(example, &s);
+    std::cout << "------DFS------" << std::endl;
+    DFS(example);
 }

@@ -21,11 +21,17 @@ struct vertex
 };
 
 typedef vector<vertex*> graph;
+typedef enum { WHITE, GRAY, BLACK } color_type;
+
+void DFS_visit(vertex*, 
+               int*, 
+               map<vertex*, color_type>&,
+               map<vertex*, vertex*>,
+               map<vertex*, int>,
+               map<vertex*, int>);
 
 void BFS(graph& g, vertex* start)
 {
-	typedef enum { WHITE, GRAY, BLACK } color_type;
-
 	map<vertex*, color_type> color;
 	map<vertex*, int> distance;
 	map<vertex*, vertex*> parent;
@@ -62,5 +68,48 @@ void BFS(graph& g, vertex* start)
 		color[u] = BLACK;
 		std::cout << u->name << " " << distance[u] << std::endl;
 	}
+}
+
+void DFS(graph& g)
+{
+    map<vertex*, color_type> color;
+    map<vertex*, vertex*> parent;
+    map<vertex*, int> start;
+    map<vertex*, int> finish;
+    for (auto iter = g.begin(); iter != g.end(); iter++)
+    {
+        color[*iter] = WHITE;
+        parent[*iter] = nullptr;
+    }
+    int time = 0;
+    for (auto iter = g.begin(); iter != g.end(); iter++)
+        if (color[*iter] == WHITE)
+            DFS_visit(*iter, &time, color, parent, start, finish);
+}
+
+void DFS_visit(vertex* u, 
+               int* time, 
+               map<vertex*, color_type>& color,
+               map<vertex*, vertex*> parent,
+               map<vertex*, int> start,
+               map<vertex*, int> finish)
+{
+    color[u] = GRAY;
+    (*time)++;
+    start[u] = *time;
+    for (auto iter = u->linked_vertex.begin(); 
+         iter != u->linked_vertex.end();
+         iter++)
+    {
+        if (color[*iter] == WHITE)
+        {
+            parent[*iter] = u;
+            DFS_visit(*iter, time, color, parent, start, finish);
+        }
+    }
+    color[u] = BLACK;
+    (*time)++;
+    finish[u] = *time;
+    std::cout << u->name << " " << start[u] << " " << finish[u] << std::endl;
 }
 #endif
